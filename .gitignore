@@ -1,0 +1,16 @@
+# 操作系统及编辑器临时文件
+Thumbs.db
+Desktop.ini
+.DS_Store
+~$*
+*.tmp
+*.bak
+*.swp
+
+# 打包产物
+*.zip
+
+# 本地配置及密钥
+.env
+.env.*
+!.env.example
