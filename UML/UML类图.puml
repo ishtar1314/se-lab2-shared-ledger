@@ -1,0 +1,87 @@
+@startuml
+
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classBackgroundColor #F8FAFC
+skinparam classBorderColor #64748B
+skinparam ArrowColor #64748B
+skinparam nodesep 35
+skinparam ranksep 45
+
+class "用户\nUser" as User {
+  -id: Long
+  -username: String
+  +register(): void
+  +login(): void
+}
+
+class "账本\nLedger" as Ledger {
+  -id: Long
+  -name: String
+  +inviteMember(): void
+  +queryEntries(): List<Entry>
+  +statistics(): Map
+  +settle(): Settlement
+}
+
+class "账本成员\nMembership" as Membership {
+  -role: String
+  -active: Boolean
+  +changeRole(role: String): void
+  +exit(): void
+}
+
+class "收支记录\nEntry" as Entry {
+  -id: Long
+  -type: String
+  -amount: Decimal
+  -date: Date
+  -status: String
+  +edit(): void
+  +submit(): void
+  +withdraw(): void
+  +review(approved, reason): void
+  +voidEntry(reason): void
+  +correct(): Entry
+}
+
+class "分类\nCategory" as Category {
+  -name: String
+  -type: String
+  -enabled: Boolean
+  +disable(): void
+}
+
+class "预算\nBudget" as Budget {
+  -amount: Decimal
+  -period: String
+  +remaining(used: Decimal): Decimal
+}
+
+class "结算快照\nSettlement" as Settlement {
+  -period: String
+  -totalIncome: Decimal
+  -totalExpense: Decimal
+  -memberResults: Map
+  +getBalance(): Decimal
+}
+
+class "操作日志\nOperationLog" as OperationLog {
+  -operatorId: Long
+  -action: String
+  -targetId: String
+  -time: DateTime
+}
+
+User "1" -- "0..*" Membership : holds
+Ledger "1" -- "1..*" Membership : has
+Ledger "1" -- "0..*" Entry : contains
+User "1" -- "0..*" Entry : submits
+Ledger "1" -- "0..*" Category : defines
+Category "1" -- "0..*" Entry : categorizes
+Category "1" -- "0..*" Budget : has
+Ledger "1" -- "0..*" Settlement : generates
+Ledger "0..1" -- "0..*" OperationLog : records
+@enduml

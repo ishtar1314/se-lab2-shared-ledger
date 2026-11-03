@@ -1,0 +1,35 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam ArrowColor #64748B
+hide footbox
+
+' 场景：已登录的成员选择账本，新增记录并提交审核。
+' 仅展示成功主线；校验失败、重复提交及操作日志等细节在其他设计中说明。
+actor "成员\nMember" as Member
+boundary "记账页面\nEntry Page" as Page
+participant "收支管理\nEntry Management" as Entry
+database "数据库\nDatabase" as DB
+
+Member -> Page : selectLedger(ledgerId)
+Page --> Member : showEntryForm()
+Member -> Page : fillAndSave(data)
+Page -> Entry : saveDraft(ledgerId, data)
+
+Entry -> DB : loadMembershipAndCategory()
+DB --> Entry : membership, category
+Entry -> Entry : validatePermissionAndData()
+Entry -> DB : saveDraft(data)
+DB --> Entry : entryId
+Entry --> Page : draftSaved(entryId)
+Page --> Member : showDraftSaved()
+
+Member -> Page : submit(entryId)
+Page -> Entry : submitForReview(entryId)
+Entry -> DB : submitIfAllowed(entryId)
+DB --> Entry : pendingReview
+Entry --> Page : submitSuccess
+Page --> Member : showSubmitSuccess()
+@enduml

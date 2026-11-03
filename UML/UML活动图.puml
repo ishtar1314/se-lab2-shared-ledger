@@ -1,0 +1,52 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam activityBackgroundColor #F8FAFC
+skinparam activityBorderColor #64748B
+skinparam ArrowColor #64748B
+
+start
+:成员登录账户;
+:选择有权限的账本;
+
+repeat
+  :成员填写收支信息;
+  :系统校验输入;
+backward:提示输入错误;
+repeat while (输入是否合法？) is (no) not (yes)
+
+:保存草稿并记录日志;
+
+:成员提交审核;
+:更新为待审核并记录日志;
+
+:审核者发起审核;
+if (有审核权限且不是提交人本人？) then (yes)
+  :审核者查看记录并给出意见;
+else (no)
+  :拒绝本次审核\n不改变记录;
+  stop
+endif
+
+
+:开始事务并锁定记录与期间;
+if (仍为待审核且期间未关闭？) then (yes)
+  if (审核通过？) then (yes)
+    :状态变为已审核;
+  else (no)
+    :填写驳回原因;
+    :状态变为已驳回;
+  endif
+
+  :保存审核信息并提交事务;
+  :记录审核操作日志;
+else (no)
+  :回滚事务;
+  :提示记录状态已变化或期间已关闭\n请刷新后重试;
+  stop
+endif
+stop
+@enduml
+

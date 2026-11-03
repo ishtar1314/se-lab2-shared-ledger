@@ -1,0 +1,29 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 14
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam componentBackgroundColor #F8FAFC
+skinparam componentBorderColor #64748B
+skinparam ArrowColor #64748B
+skinparam nodesep 35
+skinparam ranksep 45
+
+component "用户与权限\nUser & Permission" as Auth
+component "账本管理\nLedger Management" as Ledger
+component "收支管理\nEntry Management" as Entry
+component "预算与统计\nBudget & Statistics" as Statistics
+component "结算管理\nSettlement Management" as Settlement
+component "操作日志\nOperation Log" as Log
+
+Ledger ..> Auth : checks permission
+Entry ..> Auth : checks permission
+Entry ..> Ledger : accesses ledger
+
+Statistics ..> Entry : reads entries
+Settlement ..> Entry : reads approved entries
+
+Ledger ..> Log : records actions
+Entry ..> Log : records actions
+Settlement ..> Log : records actions
+@enduml
